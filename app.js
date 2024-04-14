@@ -8,6 +8,7 @@ app.use((req, res, next) => {
 });
 app.use((req, res, next) => {
   console.log("second middleware");
+  res.send("<h1>hello from express</h1>");
 });
 
 app.listen(3000);
