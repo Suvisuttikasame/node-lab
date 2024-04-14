@@ -1,49 +1,22 @@
-const http = require("http");
+const path = require("path");
+const express = require("express");
+const bodyParser = require("body-parser");
 
-const users = [];
+const adminRouter = require("./routers/admin");
+const shopRouter = require("./routers/shop");
 
-const server = http.createServer((req, res) => {
-  if (req.url === "/") {
-    res.write("Hello from node server");
-    return res.end();
-  }
-  if (req.url === "/users") {
-    res.write("<html>");
-    res.write("<header><title>User</title></header>");
-    res.write("<body><ul>");
-    for (let index = 0; index < users.length; index++) {
-      const user = users[index];
-      res.write(`<li>${user}</li>`);
-    }
-    res.write("</ul></body>");
-    res.write("</html>");
-    return res.end();
-  }
-  if (req.url === "/create-user" && req.method === "GET") {
-    res.write("<html>");
-    res.write("<header><title>Create User</title></header>");
-    res.write("<body><form action='/create-user'  method='POST'>");
-    res.write("<input type='text' name='userName'/>");
-    res.write("<button type='submit'>submit</button>");
-    res.write("</form></body>");
-    res.write("</html>");
-    return res.end();
-  }
+const app = express();
 
-  if (req.url === "/create-user" && req.method === "POST") {
-    const body = [];
-    req.on("data", (chunk) => {
-      body.push(chunk);
-    });
-    req.on("end", (data) => {
-      const message = Buffer.concat(body).toString();
-      const name = message.split("=")[1];
-      users.push(name);
-      res.statusCode = 302;
-      res.setHeader("Location", "/users");
-      res.end();
-    });
-  }
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, "public")));
+
+app.use("/admin", adminRouter);
+
+app.use(shopRouter);
+
+//handle page not found error
+app.use((req, res, next) => {
+  res.status(404).sendFile(path.join(__dirname, "views", "404.html"));
 });
 
-server.listen(3000);
+app.listen(3000);
