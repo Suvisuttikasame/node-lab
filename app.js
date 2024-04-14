@@ -12,4 +12,9 @@ app.use(adminRouter);
 
 app.use(shopRouter);
 
+//handle page not found error
+app.use((req, res, next) => {
+  res.status(404).send("<h1>Page Not Found</h1>");
+});
+
 app.listen(3000);
