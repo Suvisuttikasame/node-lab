@@ -1,4 +1,5 @@
-const products = [];
+const path = require("path");
+const fs = require("fs");
 
 module.exports = class Product {
   constructor(title) {
@@ -6,10 +7,27 @@ module.exports = class Product {
   }
 
   save() {
-    products.push(this);
+    let products = [];
+    const p = path.join(__dirname, "../", "data", "product.json");
+    fs.readFile(p, (err, content) => {
+      if (!err) {
+        products = JSON.parse(content);
+        products.push(this);
+        fs.writeFile(p, JSON.stringify(products), (err) => {
+          console.log(err);
+        });
+      }
+    });
   }
 
-  static fetchAll() {
-    return products;
+  static fetchAll(cb) {
+    let products = [];
+    const p = path.join(__dirname, "../", "data", "product.json");
+    fs.readFile(p, (err, content) => {
+      if (!err) {
+        products = JSON.parse(content);
+      }
+      cb(products);
+    });
   }
 };
