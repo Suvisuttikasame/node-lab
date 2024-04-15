@@ -28,7 +28,20 @@ app.use(errorController.get404);
 User.hasMany(Product);
 
 sequelize
-  .sync({ force: true })
+  //   .sync({ force: true })
+  .sync()
+  .then((result) => {
+    User.findByPk(1);
+  })
+  .then((user) => {
+    if (!user) {
+      return User.create({
+        name: "dummy",
+        email: "dummy@mail.com",
+      });
+    }
+    return Promise.resolve(user);
+  })
   .then((result) => {
     app.listen(3000);
   })
