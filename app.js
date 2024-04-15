@@ -15,6 +15,8 @@ const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const Product = require("./models/product");
 const User = require("./models/user");
+const CartItem = require("./models/cartItem");
+const Cart = require("./models/cart");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -35,10 +37,12 @@ app.use(errorController.get404);
 
 //relation table
 User.hasMany(Product, { constraints: true, onDelete: "CASCADE" });
+Cart.hasOne(User);
+Cart.belongsToMany(Product, { through: CartItem });
 
 sequelize
-  //   .sync({ force: true })
-  .sync()
+  .sync({ force: true })
+  //   .sync()
   .then((result) => {
     return User.findByPk(1);
   })
