@@ -37,12 +37,15 @@ app.use(errorController.get404);
 
 //relation table
 User.hasMany(Product, { constraints: true, onDelete: "CASCADE" });
+Product.belongsTo(User);
 Cart.hasOne(User);
-Cart.belongsToMany(Product, { through: CartItem });
+User.belongsTo(Cart);
+Cart.belongsToMany(Product, { through: CartItem, onDelete: "CASCADE" });
+Product.belongsToMany(Cart, { through: CartItem, onDelete: "CASCADE" });
 
 sequelize
-  .sync({ force: true })
-  //   .sync()
+  //   .sync({ force: true })
+  .sync()
   .then((result) => {
     return User.findByPk(1);
   })
@@ -55,6 +58,14 @@ sequelize
     }
     return Promise.resolve(user);
   })
+  .then((user) => {
+    return user.getCart().then((cart) => {
+      if (!cart) {
+        return user.createCart();
+      }
+    });
+  })
+
   .then((result) => {
     app.listen(3000);
   })
