@@ -2,3 +2,4 @@ node_modules
 
 
 dev-tool/db-sql/data
+dev-tool/db-mongo/data
