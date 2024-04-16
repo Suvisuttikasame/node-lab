@@ -19,18 +19,19 @@ const CartItem = require("./models/cartItem");
 const Cart = require("./models/cart");
 const Order = require("./models/order");
 const OrderItem = require("./models/orderItem");
-const moongoClient = require("./util/mongo-database");
+const { mongoConnect } = require("./util/mongo-database");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  User.findByPk(1)
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => console.log(err));
+  // User.findByPk(1)
+  //   .then((user) => {
+  //     req.user = user;
+  //     next();
+  //   })
+  //   .catch((err) => console.log(err));
+  next();
 });
 
 app.use("/admin", adminRoutes);
@@ -38,15 +39,10 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-moongoClient
-  .connect()
-  .then((c) => {
-    console.log("hello", c);
-    app.listen(3000);
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+mongoConnect(() => {
+  console.log("server is running on 3000");
+  app.listen(3000);
+});
 
 //relation table
 // User.hasMany(Product, { constraints: true, onDelete: "CASCADE" });
