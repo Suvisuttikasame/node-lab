@@ -69,7 +69,6 @@ exports.postCart = (req, res, next) => {
       return cart.getProducts({ where: { id: prodId } });
     })
     .then((products) => {
-      console.log(products);
       if (products.length > 0) {
         //update qty
         const product = products[0];
@@ -106,10 +105,44 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  res.render("shop/orders", {
-    path: "/orders",
-    pageTitle: "Your Orders",
+  const user = req.user;
+  user.getOrders({ include: Product }).then((orders) => {
+    res.render("shop/orders", {
+      path: "/orders",
+      pageTitle: "Your Orders",
+      orders,
+    });
   });
+};
+
+exports.postOrder = (req, res, next) => {
+  const user = req.user;
+  let resetCart;
+  user
+    .getCart()
+    .then((cart) => {
+      resetCart = cart;
+      return cart.getProducts();
+    })
+    .then((products) => {
+      return user.createOrder().then((order) => {
+        return order.addProducts(
+          products.map((product) => {
+            product.orderItem = { qty: product.cartItem.qty };
+            return product;
+          })
+        );
+      });
+    })
+    .then((order) => {
+      return resetCart.setProducts(null);
+    })
+    .then((result) => {
+      res.redirect("/orders");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 exports.getCheckout = (req, res, next) => {
