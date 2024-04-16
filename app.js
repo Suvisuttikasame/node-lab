@@ -19,6 +19,7 @@ const CartItem = require("./models/cartItem");
 const Cart = require("./models/cart");
 const Order = require("./models/order");
 const OrderItem = require("./models/orderItem");
+const moongoClient = require("./util/mongo-database");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -37,44 +38,54 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-//relation table
-User.hasMany(Product, { constraints: true, onDelete: "CASCADE" });
-Product.belongsTo(User);
-Cart.hasOne(User);
-User.belongsTo(Cart);
-Cart.belongsToMany(Product, { through: CartItem });
-Product.belongsToMany(Cart, { through: CartItem });
-User.hasMany(Order);
-Order.belongsTo(User);
-Order.belongsToMany(Product, { through: OrderItem });
-Product.belongsToMany(Order, { through: OrderItem });
-
-sequelize
-  // .sync({ force: true })
-  .sync()
-  .then((result) => {
-    return User.findByPk(1);
-  })
-  .then((user) => {
-    if (!user) {
-      return User.create({
-        name: "dummy",
-        email: "dummy@mail.com",
-      });
-    }
-    return Promise.resolve(user);
-  })
-  .then((user) => {
-    return user.getCart().then((cart) => {
-      if (!cart) {
-        return user.createCart();
-      }
-    });
-  })
-
-  .then((result) => {
+moongoClient
+  .connect()
+  .then((c) => {
+    console.log("hello", c);
     app.listen(3000);
   })
   .catch((err) => {
     console.log(err);
   });
+
+//relation table
+// User.hasMany(Product, { constraints: true, onDelete: "CASCADE" });
+// Product.belongsTo(User);
+// Cart.hasOne(User);
+// User.belongsTo(Cart);
+// Cart.belongsToMany(Product, { through: CartItem });
+// Product.belongsToMany(Cart, { through: CartItem });
+// User.hasMany(Order);
+// Order.belongsTo(User);
+// Order.belongsToMany(Product, { through: OrderItem });
+// Product.belongsToMany(Order, { through: OrderItem });
+
+// sequelize
+//   // .sync({ force: true })
+//   .sync()
+//   .then((result) => {
+//     return User.findByPk(1);
+//   })
+//   .then((user) => {
+//     if (!user) {
+//       return User.create({
+//         name: "dummy",
+//         email: "dummy@mail.com",
+//       });
+//     }
+//     return Promise.resolve(user);
+//   })
+//   .then((user) => {
+//     return user.getCart().then((cart) => {
+//       if (!cart) {
+//         return user.createCart();
+//       }
+//     });
+//   })
+
+//   .then((result) => {
+//     app.listen(3000);
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
