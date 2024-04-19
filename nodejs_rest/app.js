@@ -4,8 +4,10 @@ const bodyParser = require("body-parser");
 const feedRouter = require("./routes/feed");
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-app.use(feedRouter);
+app.use("/feed", feedRouter);
 
-app.listen(8080);
+app.listen(8080, () => {
+  console.log("server is running on port 8080");
+});
