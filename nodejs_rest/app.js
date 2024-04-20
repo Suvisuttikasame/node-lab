@@ -62,8 +62,6 @@ app.use((error, req, res, next) => {
 mongoose
   .connect("mongodb://root:root@localhost:27017/", {
     dbName: "feed",
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
   })
   .then((result) => {
     app.listen(8080);
